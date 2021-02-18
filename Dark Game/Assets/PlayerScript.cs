@@ -11,20 +11,27 @@ public class PlayerScript : MonoBehaviour
 
     private Vector2 move;
 
-    [SerializeField] public Radar radar;
-    // Start is called before the first frame update
+    public Radar radar;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
     }
 
-    // Update is called once per frame
     void Update()
     {
 
         move.x = Input.GetAxisRaw("Horizontal");
         move.y = Input.GetAxisRaw("Vertical");
-        //radar.SetOrigin(transform.position);
+
+        if(Input.GetKeyDown(KeyCode.Space)){
+            Instantiate(radar, transform.position, transform.rotation);
+        }
+        if (Input.GetMouseButtonDown(0)) {
+             Vector3 target = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+             target.z = transform.position.z;
+             Instantiate(radar, target, transform.rotation);
+         }
     }
 
     void FixedUpdate()
