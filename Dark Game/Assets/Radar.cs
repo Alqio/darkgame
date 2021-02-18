@@ -7,21 +7,104 @@ public class Radar : MonoBehaviour
 
     [SerializeField] public LayerMask layerMask;
     private Mesh mesh;
-    public float inner, outer;
+    public float radarSpeed, radarTime;
     Vector3 origin;
+    private float inner, outer, radarTimer;
+
+    private float rayLength = 0f;
+    private Vector3 raycastOrigin;
+    public LineRenderer line;
+
 
     void Start()
     {
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
+        //line = GetComponent<LineRenderer>();
+    }
+
+    void Update()
+    {
+        /*
+        if(Input.GetKey(KeyCode.Q)){
+            radarTimer = radarTime;
+            raycastOrigin = transform.position;
+        }
+
+        if(radarTimer > 0f){
+            rayLength += radarSpeed *  Time.deltaTime;
+            radarTimer -= Time.deltaTime;
+        } else {
+            rayLength = 0f;
+        }
+        */
+        if(Input.GetKey(KeyCode.Q)){
+            radarTimer = radarTime;
+        }
+
+        if(radarTimer > 0f){
+            outer += radarSpeed *  Time.deltaTime;
+            radarTimer -= Time.deltaTime;
+        } else if(inner < outer) {
+            inner += radarSpeed * Time.deltaTime;
+        }else{
+            inner = 0f;
+            outer = 0f;
+        }
     }
 
     void LateUpdate()
     {
-        //origin = ;
-        //Debug.Log(origin);
-        //Debug.Log(transform.TransformPoint(origin));
-        int rayCount = 7;
+        UpdateMesh();
+        /*
+        if(raycastOrigin != null){
+            //Debug.Log(line);
+            var p = GetOutline();
+            foreach (var item in p)
+            {
+                //Debug.Log(item);
+            }
+            line.SetPositions(p);
+        }
+        */
+    }
+
+    private Vector3[] GetOutline()
+    {
+        int rayCount = 50;
+        float angle = 0f;
+        float angleIncrease = 360f / rayCount;
+
+        Vector3[] points = new Vector3[rayCount];
+        for(int i = 0; i < rayCount; i++){
+            Vector3 point;
+
+            RaycastHit2D raycastHit2D = Physics2D.Raycast(raycastOrigin, GetVectorFromAngle(angle), rayLength, layerMask);
+            /*
+            */
+            Debug.Log(raycastOrigin);
+            Debug.Log(rayLength);
+            Debug.Log(raycastHit2D.collider);
+            Debug.DrawRay(raycastOrigin, GetVectorFromAngle(angle) * rayLength, Color.red);
+            if(raycastHit2D.collider == null){
+                // No hit
+                point = GetVectorFromAngle(angle) * outer;
+            } else {
+                //Hit object
+                point = raycastHit2D.point - new Vector2(raycastOrigin.x, raycastOrigin.y);
+            }
+
+            points[i] = point;
+            angle -= angleIncrease;
+
+        }
+        
+        return points;
+    }
+
+    private void UpdateMesh()
+    {
+        int rayCount = 50;
         float angle = 0f;
         float angleIncrease = 360f / rayCount;
 
@@ -46,7 +129,7 @@ public class Radar : MonoBehaviour
             }
 
             RaycastHit2D innerRaycastHit2D = Physics2D.Raycast(transform.position, GetVectorFromAngle(angle), inner, layerMask);
-            if (outerRaycastHit2D.collider == null)
+            if (innerRaycastHit2D.collider == null)
             {
                 //No hit
                 pointOnInner = GetVectorFromAngle(angle) * inner;
@@ -59,43 +142,22 @@ public class Radar : MonoBehaviour
 
             verticies[i] = pointOnInner;
             verticies[i + 1] = pointOnOuter;
-            /*
-            if (i == 0) {
-                triangles[0] = 0;
-                triangles[1] = 1;
-                triangles[2] = 2;
-            } else {
-                triangles[triangleIndex] = ;
-                triangles[triangleIndex + 1] = vertexIndex - 1;
-                triangles[triangleIndex + 2] = vertexIndex;
-                triangleIndex += 3;
-
-            }
-*/
-            angle -= angleIncrease;
-        }
-
-        //012 123 234 345 456 567 678 789
-        for(int i = 0; i < rayCount; i++){
-            triangles[i * 4] = i*2; 
-            triangles[i * 4 + 1] = i*2 + 1; 
-            if(i < rayCount - 1){
-                triangles[i * 4 + 2] = i*2 + 3; 
-            } else {
-                triangles[i * 4 + 2] = 1; 
-            }
-            triangles[i * 4 + 3] = i*2;
             
-        }
-/*
-        foreach (var item in verticies)
-        {
-            Debug.Log("v: " + item);
-        }
-*/
-        foreach (var item in triangles)
-        {
-            Debug.Log("p: " + item);
+            triangles[i * 3] = i; 
+            triangles[i * 3 + 1] = i + 1; 
+            triangles[i * 3 + 3] = i + 1; 
+            if(i < verticies.Length - 2){
+                triangles[i * 3 + 2] = i + 2; 
+                triangles[i * 3 + 4] = i + 3; 
+                triangles[i * 3 + 5] = i + 2; 
+            } else {
+                triangles[i * 3 + 2] = 0; 
+                triangles[i * 3 + 4] = 1; 
+                triangles[i * 3 + 5] = 0; 
+
+            }
+
+            angle -= angleIncrease;
         }
 
         mesh.vertices = verticies;
