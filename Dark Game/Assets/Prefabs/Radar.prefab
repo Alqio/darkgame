@@ -142,9 +142,42 @@ MonoBehaviour:
   layerMask:
     serializedVersion: 2
     m_Bits: 512
-  radarSpeed: 10
-  RADAR_MAX: 0.5
+  RADAR_MAX: 5
   TIME_AT_FULL: 3
   fullCircle: 0
   lineObject: {fileID: 4864286441564633373, guid: aa2207fb5e037ce478624db010f900b9,
     type: 3}
+  rayCount: 360
+  rayLength:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: -0.0012779236
+      value: 0
+      inSlope: 42.542366
+      outSlope: 42.542366
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.084413
+    - serializedVersion: 3
+      time: 0.34632915
+      value: 6.603283
+      inSlope: 6.232029
+      outSlope: 6.232029
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.24479721
+      outWeight: 0.27948084
+    - serializedVersion: 3
+      time: 0.99905324
+      value: 7.9608784
+      inSlope: 0.54431534
+      outSlope: 0.54431534
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.096788734
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4

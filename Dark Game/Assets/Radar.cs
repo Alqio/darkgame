@@ -6,25 +6,30 @@ public class Radar : MonoBehaviour
 {
 
     [SerializeField] public LayerMask layerMask;
-    public float radarSpeed, RADAR_MAX, TIME_AT_FULL;
+    public float RADAR_MAX, TIME_AT_FULL;
     public bool fullCircle;
     public GameObject lineObject;
 
-    private float innerDistance, radarTimer, rayLength;
-    private int rayCount = 100;
+    private float innerDistance, radarTimer;
+    public int rayCount;
     private LineRenderer lr;
     private List<GameObject> lines = new List<GameObject>();
     private bool newLine = true;
     private Vector3[] outerCircle;
     private List<GameObject> foundObjects = new List<GameObject>();
     private List<string> foundIds = new List<string>();
+
+    public AnimationCurve rayLength;
+    private float birthTime;
+
     void Start()
     {
-        innerDistance = radarTimer = rayLength = 0f;
+        innerDistance = radarTimer = 0f;
         lr = GetComponent<LineRenderer>();
         lr.positionCount = rayCount + 1;
         lr.loop = true;
         outerCircle = new Vector3[rayCount+1];
+        birthTime = Time.time;
     }
 
     void Update()
@@ -32,7 +37,7 @@ public class Radar : MonoBehaviour
 
         radarTimer += Time.deltaTime;
         if(radarTimer < RADAR_MAX){
-            rayLength += radarSpeed *  Time.deltaTime;
+            Debug.Log(radarTimer + " : " + rayLength.Evaluate(radarTimer));
             if(fullCircle){
                 lr.SetPositions(GetOutlineFull());
             }else{
@@ -55,8 +60,8 @@ public class Radar : MonoBehaviour
             }
             */
             
-            if(innerDistance < rayLength){
-                innerDistance += radarSpeed * Time.deltaTime;
+            if(innerDistance < rayLength.Evaluate(radarTimer)){
+                innerDistance = rayLength.Evaluate(radarTimer - 5f);
                 FilterLinePoints();
             } else {
                 Destroy(gameObject);
@@ -132,10 +137,10 @@ public class Radar : MonoBehaviour
         for(int i = 0; i < rayCount; i++){
             Vector3 point;
 
-            RaycastHit2D raycastHit2D = Physics2D.Raycast(transform.position, GetVectorFromAngle(angle), rayLength, layerMask);
+            RaycastHit2D raycastHit2D = Physics2D.Raycast(transform.position, GetVectorFromAngle(angle), rayLength.Evaluate(radarTimer), layerMask);
             if(raycastHit2D.collider == null){
                 // No hit
-                point = GetVectorFromAngle(angle) * rayLength;
+                point = GetVectorFromAngle(angle) * rayLength.Evaluate(radarTimer);
             } else {
                 //Hit object
                 point = raycastHit2D.point - new Vector2(transform.position.x, transform.position.y);
@@ -164,11 +169,11 @@ public class Radar : MonoBehaviour
         Vector3[] points = new Vector3[rayCount];
         Vector3 prevPoint = Vector3.zero;
         for(int i = 0; i < rayCount + 1; i++){
-            outerCircle[i] = GetVectorFromAngle(angle) * rayLength + transform.position;
+            outerCircle[i] = GetVectorFromAngle(angle) * rayLength.Evaluate(radarTimer) + transform.position;
             Vector3 point = Vector3.zero;
 
 
-            RaycastHit2D[] raycastHit2Darr = Physics2D.RaycastAll(transform.position, GetVectorFromAngle(angle), rayLength, layerMask);
+            RaycastHit2D[] raycastHit2Darr = Physics2D.RaycastAll(transform.position, GetVectorFromAngle(angle), rayLength.Evaluate(radarTimer), layerMask);
             bool hasWallHit = false;
             foreach(RaycastHit2D hit in raycastHit2Darr){
                 point = hit.point;
@@ -213,7 +218,7 @@ public class Radar : MonoBehaviour
             }
             if(!hasWallHit){
                 // No hit
-                point = GetVectorFromAngle(angle) * rayLength;
+                point = GetVectorFromAngle(angle) * rayLength.Evaluate(radarTimer);
                 newLine = true;
             }
 

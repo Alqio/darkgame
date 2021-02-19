@@ -15,11 +15,8 @@ public class FieldOfView : MonoBehaviour
     Vector3 origin;
     private float inner, outer, radarTimer;
 
-    private float rayLength = 0f;
     private int rayCount = 50;
 
-    public LineRenderer line;
-    private LineRenderer lr;
 
 
     void Start()
