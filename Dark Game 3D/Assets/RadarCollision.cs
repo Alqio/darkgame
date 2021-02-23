@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class RadarCollision : MonoBehaviour
 {
-    ContactPoint[] contacts = new ContactPoint[1000];
+    List<ContactPoint> contacts = new List<ContactPoint>();
     public LineRenderer lr;
     // Start is called before the first frame update
     void Start()
@@ -16,7 +16,7 @@ public class RadarCollision : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Physics
+        
     }
 
     void OnCollisionStay(Collision col){
@@ -29,8 +29,8 @@ public class RadarCollision : MonoBehaviour
             Debug.Log(item.point);
         }
   */      
-        lr.positionCount = contacts.Length;
-        for(int i = 0; i < contacts.Length; i++)
+        lr.positionCount = contacts.Count;
+        for(int i = 0; i < contacts.Count; i++)
         {   
             lr.SetPosition(i, contacts[i].point);
         }
