@@ -4,25 +4,34 @@ using UnityEngine;
 
 public class NewRadar : MonoBehaviour
 {
-    private float size, timer;
-    public float speed, maxSize = 10f, timeAtMax = 5f;
+    private float timer, radius;
+    public float  speed, maxRadius = 20f, timeAtMax = 5f;
 
-
+   
+    //float radius;
     void Start()
     {
-        size = 0f;
+        radius = 0f;
+        Shader.SetGlobalVector("_Position", transform.position);
     }
 
     void Update()
     {
-        if(size < maxSize) {
-            size += speed * Time.deltaTime;
-            transform.localScale = Vector3.one * size;
+        //radius = transform.localScale.x/2;
+        //GetComponent<Renderer>().material.SetVector("_Position", transform.position);
+        //GetComponent<Renderer>().material.SetFloat("_Radius", radius);
+        if(radius < maxRadius) {
+            radius += speed * Time.deltaTime;
+            transform.localScale = Vector3.one * radius;
+            Shader.SetGlobalFloat("_Radius", radius);
         } else {
             timer += Time.deltaTime;
             if(timer > timeAtMax){
+                Shader.SetGlobalFloat("_Radius", 0);
                 Destroy(gameObject);
             }
         }
+        /*
+        */
     }
 }

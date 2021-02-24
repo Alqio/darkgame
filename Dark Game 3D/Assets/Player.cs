@@ -9,7 +9,7 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        Shader.SetGlobalFloat("_Radius", 0);
     }
 
     // Update is called once per frame
